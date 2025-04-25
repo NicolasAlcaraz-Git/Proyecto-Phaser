@@ -2,9 +2,8 @@
 
 export default class Game extends Phaser.Scene {
   constructor() {
-    // key of the scene
-    // the key will be used to start the scene by other scenes
     super("game");
+    this.countdown = 30; // Inicializa el temporizador con 30 segundos
   }
 
   init() {
@@ -20,7 +19,7 @@ export default class Game extends Phaser.Scene {
     this.load.image("ground", "./public/assets/platform.png");
     this.load.image("star", "./public/assets/star.png");
     this.load.image("bomb", "./public/assets/bomb.png");
-    this.load.image("gameover", "./public/assets/game over.png");
+    this.load.image("gameover", "./public/assets/gameover.png");
     this.load.spritesheet("dude", "./public/assets/dude.png", {
       frameWidth: 32,
       frameHeight: 48,
@@ -28,7 +27,10 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    // create game objects
+    // Reinicia el temporizador al valor inicial
+    this.countdown = 30;
+
+    // Crea el fondo
     this.add.image(400, 300, "sky");
 
     this.platforms = this.physics.add.staticGroup();
@@ -43,6 +45,32 @@ export default class Game extends Phaser.Scene {
 
     this.player.setBounce(0.2);
     this.player.setCollideWorldBounds(true);
+
+    // Reinicia el texto del temporizador
+    this.timerText = this.add.text(this.cameras.main.width - 20, 16, `Time: ${this.countdown}`, {
+      fontSize: '32px',
+      fill: '#000'
+    }).setOrigin(1, 0);
+
+    // Evento para reducir el temporizador cada segundo
+    this.time.addEvent({
+      delay: 1000, // Reduce el tiempo cada segundo
+      callback: () => {
+        if (this.gameOver) return; // Interrumpe el tiempo si el juego ha terminado
+        this.countdown--;
+        this.timerText.setText(`Time: ${this.countdown}`);
+        if (this.countdown <= 0) {
+          this.triggerGameOver();
+        }
+      },
+      callbackScope: this,
+      loop: true
+    });
+
+    // Reinicia la escena al presionar la tecla R
+    this.input.keyboard.on('keydown-R', () => {
+      this.scene.restart();
+  });
 
     this.anims.create({
       key: "left",
@@ -154,14 +182,17 @@ export default class Game extends Phaser.Scene {
   }
 
   hitBomb(player, bomb) {
-    this.physics.pause();
-
-    this.player.setTint(0xff0000);
-
-    this.player.anims.play("turn");
-
-    this.gameOver = true;
-
-    this.add.image(400, 300, "gameover").setScale(1.0)
+    this.triggerGameOver();
   }
+
+triggerGameOver() {
+  if (this.gameOver) return;
+  this.gameOver = true;
+
+  this.physics.pause();
+  this.player.setTint(0xff0000);
+  this.player.anims.play("turn");
+
+  this.add.image(400, 300, "gameover").setScale(1.0);
+}
 }
