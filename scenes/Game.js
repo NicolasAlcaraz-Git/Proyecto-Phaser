@@ -20,6 +20,7 @@ export default class Game extends Phaser.Scene {
     this.load.image("ground", "./public/assets/platform.png");
     this.load.image("star", "./public/assets/star.png");
     this.load.image("bomb", "./public/assets/bomb.png");
+    this.load.image("gameover", "./public/assets/game over.png");
     this.load.spritesheet("dude", "./public/assets/dude.png", {
       frameWidth: 32,
       frameHeight: 48,
@@ -160,5 +161,7 @@ export default class Game extends Phaser.Scene {
     this.player.anims.play("turn");
 
     this.gameOver = true;
+
+    this.add.image(400, 300, "gameover").setScale(1.0)
   }
 }
