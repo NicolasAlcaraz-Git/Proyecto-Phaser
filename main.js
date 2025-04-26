@@ -20,8 +20,8 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
-      gravity: { y: 200 },
-      debug: true,
+      gravity: { y: 300 }, //se cambió a 300 para que los elementos caigan más rápido
+      debug: false,        //se cambió a false para que no se muestre la colisión de los elementos
     },
   },
   // List of scenes to load
